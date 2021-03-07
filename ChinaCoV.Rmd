@@ -1,0 +1,70 @@
+---
+title: "provincedata"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+## Province data
+```{r}
+library(dplyr)
+data <- read.csv('/Users/HW/Provincedata/provincedata.csv')
+head(data)
+cor_data <- data[,names(data) %in% c('nowConfirm','confirm','dead','deadRate',
+                                     'heal','healRate')]
+```
+- Question 1: What are top 10 provinces for nowConfirm in China?
+
+```{r}
+library(ggplot2)
+unique(data$name)
+dat <- data %>% select(name,nowConfirm) %>% arrange(desc(nowConfirm)) %>% slice(1:10) 
+ggplot(data=dat,aes(x=name,y=nowConfirm)) + geom_bar(stat = 'identity')
+```
+
+- Question 2: What are the top 10 provinces for deadRate in China?
+
+```{r}
+library(ggplot2)
+dat <- data %>% select(name,deadRate) %>% arrange(desc(deadRate)) %>% slice(1:10) 
+ggplot(data=dat,aes(x=name,y=deadRate)) + geom_bar(stat = 'identity')
+```
+
+- Question 3: What are the top 10 provinces for heal in China?
+```{r}
+library(ggplot2)
+dat <- data %>% select(name,heal) %>% arrange(desc(heal)) %>% slice(1:10) 
+ggplot(data=dat,aes(x=name,y=heal)) + geom_bar(stat = 'identity')
+```
+
+- Question 4: Is there any corelation between dead and heal?
+- Question 5: Is there any corelation between healRate and nowConfirm?
+
+```{r}
+library(corrplot)
+cor(mtcars[1:5])
+corrplot(cor(cor_data), method = "circle")
+```
+
+- Question 6: what is the distribution of (healRate/deadRate)?
+
+```{r}
+ggplot(data,aes(x=healRate))+geom_density() # left skewed
+ggplot(data,aes(x=deadRate))+geom_density() # right skewed
+```
+
+- Question 7: Is there any relationship between (healRate) and (deadRate)?
+```{r}
+lm.model <- lm(healRate~deadRate,data=data)
+summary(lm.model) 
+ggplot(data,aes(x=healRate,y=deadRate))+geom_point()# no relationship
+ggplot(data,aes(x=nowConfirm,y=deadRate))+geom_point() 
+```
+
+
